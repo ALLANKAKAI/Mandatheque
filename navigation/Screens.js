@@ -15,11 +15,15 @@ import Pro from "../screens/Pro";
 import Profile from "../screens/Profile";
 import Register from "../screens/Register";
 import Elements from "../screens/Elements";
-import Articles from "../screens/Articles";
-import Categ from "../screens/Categ";
 import Library from "../screens/Library";
 import Uploads from "../screens/Uploads";
 import Login from "../screens/Login";
+import SingleUpload from "../screens/SingleUpload";
+import EditProfile from "../screens/EditProfile";
+import Subscription from "../screens/Subscription";
+import Checkout from "../screens/Checkout";
+import Contact from "../screens/Contact";
+import Categories from "../screens/Categories";
 
 // drawer
 import Menu from "./Menu";
@@ -27,6 +31,7 @@ import DrawerItem from "../components/DrawerItem";
 
 // header for screens
 import Header from "../components/Header";
+
 
 const transitionConfig = (transitionProps, prevTransitionProps) => ({
   transitionSpec: {
@@ -80,11 +85,11 @@ const ElementsStack = createStackNavigator({
   transitionConfig
 });
 
-const CategStack = createStackNavigator({
-  Categ: {
-    screen: Categ,
+const CategoriesStack = createStackNavigator({
+  Categories: {
+    screen: Categories,
     navigationOptions: ({ navigation }) => ({
-      header: <Header title="Categ" navigation={navigation} />
+      header: <Header title="Categories" navigation={navigation} />
     })
   }
 },{
@@ -94,11 +99,12 @@ const CategStack = createStackNavigator({
   transitionConfig
 });
 
-const ArticlesStack = createStackNavigator({
-  Articles: {
-    screen: Articles,
+
+const SubscriptionStack = createStackNavigator({
+  Subscription: {
+    screen: Subscription,
     navigationOptions: ({ navigation }) => ({
-      header: <Header title="Articles" navigation={navigation} />
+      header: <Header title="Subscription" navigation={navigation} />
     })
   }
 },{
@@ -155,23 +161,16 @@ const ProfileStack = createStackNavigator(
 );
 
 
+
+
 const HomeStack = createStackNavigator(
   {
     Home: {
       screen: Home,
       navigationOptions: ({ navigation }) => ({
-        header: <Header search options title="Home" navigation={navigation} />
+        header: <Header  title="Home" navigation={navigation} />
       })
     },
-    Pro: {
-      screen: Pro,
-      navigationOptions: ({ navigation }) => ({
-        header: (
-          <Header left={<Block />} white transparent title="" navigation={navigation} />
-        ),
-        headerTransparent: true
-      })
-    }
   },
   {
     cardStyle: {
@@ -180,6 +179,7 @@ const HomeStack = createStackNavigator(
     transitionConfig
   }
 );
+
 // divideru se baga ca si cum ar fi un ecrna dar nu-i nimic duh
 const AppStack = createDrawerNavigator(
   {
@@ -201,7 +201,15 @@ const AppStack = createDrawerNavigator(
       screen: LibraryStack,
       navigationOptions: navOpt => ({
         drawerLabel: ({ focused }) => (
-          <DrawerItem focused={focused} screen="Library" title="Library" />
+          <DrawerItem focused={focused} screen="Library" title="My Library" />
+        )
+      })
+    },
+    Categories: {
+      screen: CategoriesStack,
+      navigationOptions: navOpt => ({
+        drawerLabel: ({ focused }) => (
+          <DrawerItem focused={focused} screen="Categories" title="Categories" />
         )
       })
     },
@@ -209,7 +217,15 @@ const AppStack = createDrawerNavigator(
       screen: UploadsStack,
       navigationOptions: navOpt => ({
         drawerLabel: ({ focused }) => (
-          <DrawerItem focused={focused} screen="Uploads" title="Uploads" />
+          <DrawerItem focused={focused} screen="Uploads" title="My Uploads" />
+        )
+      })
+    },
+    Subscription: {
+      screen: SubscriptionStack,
+      navigationOptions: navOpt => ({
+        drawerLabel: ({ focused }) => (
+          <DrawerItem focused={focused} screen="Subscription" title="My Subscription"/>
         )
       })
     },
@@ -221,6 +237,38 @@ const AppStack = createDrawerNavigator(
         )
       })
     },
+    Contact: {
+      screen: Contact,
+      navigationOptions: navOpt => ({
+        drawerLabel: ({ focused }) => (
+          <DrawerItem focused={focused} screen="Contact" title="Contact Us" />
+        )
+      })
+    },
+    Login: {
+      screen: Login,
+      navigationOptions: navOpt => ({
+        drawerLabel: ({ focused }) => (
+          <DrawerItem focused={focused} screen="Login" title="Sign Out" />
+        )
+      })
+    },
+    SingleUpload: {
+      screen: SingleUpload,
+      navigationOptions: navOpt => ({
+        drawerLabel: ({ focused }) => (
+          <DrawerItem focused={focused} screen="SingleUpload" title="SingleUpload" />
+        )
+      })
+    },
+    EditProfile: {
+      screen: EditProfile,
+      navigationOptions: navOpt => ({
+        drawerLabel: ({ focused }) => (
+          <DrawerItem focused={focused} screen="EditProfile" title="EditProfile" />
+        )
+      })
+    },
     Account: {
       screen: Register,
       navigationOptions: navOpt => ({
@@ -229,11 +277,13 @@ const AppStack = createDrawerNavigator(
         )
       })
     },
-    Login: {
-      screen: Login,
+    
+    
+    Checkout: {
+      screen: Checkout,
       navigationOptions: navOpt => ({
         drawerLabel: ({ focused }) => (
-          <DrawerItem focused={focused} screen="Login" title="Login" />
+          <DrawerItem focused={focused} screen="Checkout" title="Checkout" />
         )
       })
     },
@@ -244,23 +294,8 @@ const AppStack = createDrawerNavigator(
           <DrawerItem focused={focused} screen="Elements" title="Elements" />
         )
       })
-    },
-    Categ: {
-      screen: CategStack,
-      navigationOptions: navOpt => ({
-        drawerLabel: ({ focused }) => (
-          <DrawerItem focused={focused} screen="Categ" title="Categ" />
-        )
-      })
-    },
-    Articles: {
-      screen: ArticlesStack,
-      navigationOptions: navOpt => ({
-        drawerLabel: ({ focused }) => (
-          <DrawerItem focused={focused} screen="Articles" title="Articles" />
-        )
-      })
     }
+    
   },
   Menu
 );

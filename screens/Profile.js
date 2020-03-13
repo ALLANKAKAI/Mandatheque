@@ -6,12 +6,14 @@ import {
   ScrollView,
   Image,
   ImageBackground,
-  Platform
+  Platform,
+  AsyncStorage
 } from "react-native";
 import { Block, Text, theme } from "galio-framework";
 
 import { Button } from "../components";
 import { Images} from "../constants";
+import {USER_ENDPOINT} from "../constants/apis"
 import { HeaderHeight } from "../constants/utils";
 
 const { width, height } = Dimensions.get("screen");
@@ -19,7 +21,48 @@ const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
 
 class Profile extends React.Component {
+
+  constructor(){
+    super();
+    this.state = {
+    }
+  }
+
+  async getUser() {
+
+    var token = await AsyncStorage.getItem('token');
+    
+    fetch(USER_ENDPOINT,
+      {
+        headers:{
+          'Authorization':`Token ${token}`
+        },
+        method:'GET'
+      })
+    .then(res => res.json())
+    .then((result) => {
+      this.setState(result);
+      
+    })
+    .catch((error) =>{
+      console.log(error)
+    })
+  }
+
+   _userLogout = async() =>  {
+    const { navigation} = this.props;
+
+    try {
+        await AsyncStorage.removeItem('token');
+        AlertIOS.alert("Logout Success!")
+    } catch (error) {
+        console.log('AsyncStorage error: ' + error.message);
+    }
+    navigation.navigate('Login')
+}
+
   render() {
+    this.getUser();
     const { navigation} = this.props;
 
     return (
@@ -45,10 +88,13 @@ class Profile extends React.Component {
                 <Block flex>
                   <Block middle style={styles.nameInfo}>
                     <Text bold size={28} color="#32325D">
-                      Juma jux
+                      {this.state.name}
                     </Text>
                     <Text size={16} color="#32325D" style={{ marginTop: 10 }}>
-                      jux@gmail.com
+                      {this.state.email}
+                    </Text>
+                    <Text size={16} color="#32325D" style={{ marginTop: 10 }}>
+                      {this.state.phone}
                     </Text>
                   </Block>
                   <Block middle style={{ marginTop: 30, marginBottom: 16 }}>
@@ -58,27 +104,22 @@ class Profile extends React.Component {
                     
                   <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
                       <Block center>
-                        <Button color="default" style={styles.button}>
-                          Profile
+                        <Button color="default" style={styles.button} onPress={() => navigation.navigate('EditProfile',this.state)}>
+                          Edit Profile
                         </Button>
                       </Block>
                       <Block center>
-                        <Button color="error" style={styles.button}>
+                        <Button color="success" style={styles.button} onPress={() => navigation.navigate('Subscription')}>
                           Subscriptions
                         </Button>
                       </Block>
                       <Block center>
-                        <Button color="success" style={styles.button}>
-                          About Mandatheque
-                        </Button>
-                      </Block>
-                      <Block center>
-                        <Button color="warning" style={styles.button}>
+                        <Button color="warning" style={styles.button} onPress={() => navigation.navigate('Contact')}>
                           Help Center
                         </Button>
                       </Block>
                       <Block center>
-                        <Button color="error" style={styles.button} onPress={() => navigation.navigate('Login')}>
+                        <Button onPress={this._userLogout} color="error" style={styles.button} >
                           Logout
                         </Button>
                       </Block>

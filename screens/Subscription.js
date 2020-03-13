@@ -11,32 +11,26 @@ import {
 import { Block, Text, theme } from "galio-framework";
 //argon
 import { articles, Images, argonTheme } from "../constants/";
-import { Card } from "../components/";
+import { Card, Button } from "../components/";
 
-const { width } = Dimensions.get("screen");
+const { width, height } = Dimensions.get("screen");
 
 const thumbMeasure = (width - 48 - 32) / 3;
 const cardWidth = width - theme.SIZES.BASE * 2;
 const categories = [
   {
-    title: "Music Album",
-    description:
-      "Rock music is a genre of popular music. It developed during and after the 1960s in the United Kingdom.",
-    image:
-      "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?fit=crop&w=840&q=80",
-    price: "$125"
+    title: "Month",
+    price: "$20/",
+    status: "Active"
   },
   {
-    title: "Events",
-    description:
-      "Rock music is a genre of popular music. It developed during and after the 1960s in the United Kingdom.",
-    image:
-      "https://images.unsplash.com/photo-1543747579-795b9c2c3ada?fit=crop&w=840&q=80",
-    price: "$35"
+    title: "Year",
+    price: "$200/",
+    status: "Inactive"
   }
 ];
 
-class Articles extends React.Component {
+class Subscription extends React.Component {
   renderProduct = (item, index) => {
     const { navigation } = this.props;
 
@@ -46,17 +40,12 @@ class Articles extends React.Component {
         key={`product-${item.title}`}
         onPress={() => navigation.navigate("Pro", { product: item })}
       >
-        <Block center style={styles.productItem}>
-          <Image
-            resizeMode="cover"
-            style={styles.productImage}
-            source={{ uri: item.image }}
-          />
+          
+        <Block flex middle style={styles.registerContainer}>
           <Block center style={{ paddingHorizontal: theme.SIZES.BASE }}>
             <Text
               center
-              size={16}
-              color={theme.COLORS.MUTED}
+              size={60}
               style={styles.productPrice}
             >
               {item.price}
@@ -68,10 +57,17 @@ class Articles extends React.Component {
               center
               size={16}
               color={theme.COLORS.MUTED}
-              style={styles.productDescription}
+              style={styles.productStatus}
             >
-              {item.description}
+              {item.status}
             </Text>
+          </Block>
+          <Block middle>
+            <Button color="primary" style={styles.createButton} onPress={() => navigation.navigate('Checkout')}>
+                <Text bold size={14} color={argonTheme.COLORS.WHITE}>
+                    Subscribe!
+                </Text>
+            </Button>
           </Block>
         </Block>
       </TouchableWithoutFeedback>
@@ -81,43 +77,10 @@ class Articles extends React.Component {
   renderCards = () => {
     return (
       <Block flex style={styles.group}>
-        <Text bold size={16} style={styles.title}>
-          Cards
-        </Text>
         <Block flex>
-          <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
-            <Card item={articles[0]} horizontal />
-            <Block flex row>
-              <Card
-                item={articles[1]}
-                style={{ marginRight: theme.SIZES.BASE }}
-              />
-              <Card item={articles[2]} />
-            </Block>
-            <Card item={articles[4]} full />
-            <Block flex card shadow style={styles.category}>
-              <ImageBackground
-                source={{ uri: Images.Products["View article"] }}
-                style={[
-                  styles.imageBlock,
-                  { width: width - theme.SIZES.BASE * 2, height: 252 }
-                ]}
-                imageStyle={{
-                  width: width - theme.SIZES.BASE * 2,
-                  height: 252
-                }}
-              >
-                <Block style={styles.categoryTitle}>
-                  <Text size={18} bold color={theme.COLORS.WHITE}>
-                    View article
-                  </Text>
-                </Block>
-              </ImageBackground>
-            </Block>
-          </Block>
+          
           <Block flex style={{ marginTop: theme.SIZES.BASE / 2 }}>
             <ScrollView
-              horizontal={true}
               pagingEnabled={true}
               decelerationRate={0}
               scrollEventThrottle={16}
@@ -139,46 +102,7 @@ class Articles extends React.Component {
     );
   };
 
-  renderAlbum = () => {
-    const { navigation } = this.props;
-
-    return (
-      <Block
-        flex
-        style={[styles.group, { paddingBottom: theme.SIZES.BASE * 5 }]}
-      >
-        <Text bold size={16} style={styles.title}>
-          Album
-        </Text>
-        <Block style={{ marginHorizontal: theme.SIZES.BASE * 2 }}>
-          <Block flex right>
-            <Text
-              size={12}
-              color={theme.COLORS.PRIMARY}
-              onPress={() => navigation.navigate("Home")}
-            >
-              View All
-            </Text>
-          </Block>
-          <Block
-            row
-            space="between"
-            style={{ marginTop: theme.SIZES.BASE, flexWrap: "wrap" }}
-          >
-            {Images.Viewed.map((img, index) => (
-              <Block key={`viewed-${img}`} style={styles.shadow}>
-                <Image
-                  resizeMode="cover"
-                  source={{ uri: img }}
-                  style={styles.albumThumb}
-                />
-              </Block>
-            ))}
-          </Block>
-        </Block>
-      </Block>
-    );
-  };
+ 
 
   render() {
     return (
@@ -187,7 +111,6 @@ class Articles extends React.Component {
           showsVerticalScrollIndicator={false}
         >
           {this.renderCards()}
-          {this.renderAlbum()}
         </ScrollView>
       </Block>
     );
@@ -244,10 +167,34 @@ const styles = StyleSheet.create({
     paddingTop: theme.SIZES.BASE,
     paddingBottom: theme.SIZES.BASE / 2
   },
+  productStatus: {
+    paddingTop: theme.SIZES.BASE,
+    paddingBottom: theme.SIZES.BASE / 2
+  },
   productDescription: {
     paddingTop: theme.SIZES.BASE
     // paddingBottom: theme.SIZES.BASE * 2,
+  },
+  createButton: {
+    width: width * 0.5,
+    marginTop: 20
+  },
+  registerContainer: {
+    width: width * 0.9,
+    height: height * 0.5,
+    backgroundColor: "#ced8eb",
+    borderRadius: 4,
+    shadowColor: argonTheme.COLORS.BLACK,
+    shadowOffset: {
+      width: 0,
+      height: 4
+    },
+    shadowRadius: 8,
+    shadowOpacity: 0.1,
+    elevation: 1,
+    overflow: "hidden",
+    marginTop: 10
   }
 });
 
-export default Articles;
+export default Subscription;

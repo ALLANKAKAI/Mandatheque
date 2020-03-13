@@ -116,7 +116,7 @@ class Header extends React.Component {
             <Text size={20} style={styles.tabTitle}>{optionLeft || 'All Books'}</Text>
           </Block>
         </Button>
-        <Button shadowless style={styles.tab} onPress={() => navigation.navigate('Categ')}>
+        <Button shadowless style={styles.tab} onPress={() => navigation.navigate('Subjects')}>
           <Block row middle>
             <Text size={20} style={styles.tabTitle}>{optionRight || 'Categories'}</Text>
           </Block>

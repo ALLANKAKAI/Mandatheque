@@ -1,37 +1,34 @@
 import React from "react";
 import {
-  Alert,
   StyleSheet,
   ImageBackground,
   Dimensions,
   StatusBar,
   ScrollView,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  AsyncStorage
 } from "react-native";
-import { Block, Checkbox, Text, theme } from "galio-framework";
+import { Block,  Text } from "galio-framework";
 
 import { Button, Icon, Input } from "../components";
-import { Images, argonTheme} from "../constants";
-import { SIGNUP_ENDPOINT } from "../constants/apis";
-import {successAlert,errorAlert} from "../constants/Alerts"
+import { Images, argonTheme } from "../constants";
+import {USER_ENDPOINT} from "../constants/apis"
+import { successAlert,errorAlert } from "../constants/Alerts";
+
 const { width, height } = Dimensions.get("screen");
 
-class Register extends React.Component {
-  constructor(){
-    super();
+class EditProfile extends React.Component {
+  constructor(props){
+    super(props);
+    const {navigation} = this.props;
     this.state = {
-      "email": "",
-      "phone": "",
-      "name": "",
-      "password": "",
-      "password2": ""
+      "phone": navigation.state.params.phone,
+      "name": navigation.state.params.name,
+      "password":"",
+      "password2":""
     };
   }
   
-
-  changeEmail = (target) => {
-    this.setState({'email':target.nativeEvent.text});
-  }
 
   changeName = (target) => {
     this.setState({'name':target.nativeEvent.text});
@@ -49,58 +46,46 @@ class Register extends React.Component {
     this.setState({'password2':target.nativeEvent.text});
   }
 
-  async _onValueChange(item, selectedValue) {
-    try {
-      await AsyncStorage.setItem(item, selectedValue);
-    } catch (error) {
-      console.log('AsyncStorage error: ' + error.message);
+
+   save = async() => {
+    var token = await AsyncStorage.getItem('token');
+
+    if(this.state.password != this.state.password2){
+      errorAlert('Passwords dont match');
+      return false;
     }
+    if(this.state.password.length < 8 && this.state.password != ""){
+      errorAlert('Minimun length for password is 8')
+      return false;
+    }
+
+
+    fetch(USER_ENDPOINT,
+      {
+        headers:{
+          'Authorization':`Token ${token}`,
+          'Content-Type':'application/json'
+        },
+        method:'PUT',
+        body:JSON.stringify({'user':this.state})
+      })
+    .then(res => res.json())
+    .then((result) => {
+      
+      if(result.error){
+        errorAlert(result.error.email);
+        return false;
+      }
+      successAlert('Profile updated')
+
+    })
+    .catch((error) =>{
+      console.log(error)
+    })
+
   }
 
-
-  
   render() {
-    const { navigation} = this.props;
-
-    signup = () => {
-      if(this.state.password != this.state.password2){
-        errorAlert('Passwords dont match');
-        return false;
-      }
-      if(this.state.password.length < 8){
-        errorAlert('Minimun length for password is 8')
-        return false;
-      }
-  
-      fetch(SIGNUP_ENDPOINT,
-        {
-          headers:{
-            'Accept':'application/json',
-            'Content-Type':'application/json'
-          },
-          method:'POST',
-          body:JSON.stringify(this.state)
-        })
-      .then(res => res.json())
-      .then((result) => {
-        console.log(result)
-        if(result.error){
-          errorAlert(result.error.email);
-          return false;
-        }
-  
-        this._onValueChange('token',result.token);
-
-        navigation.navigate('Home');
-  
-      })
-      .catch((error) =>{
-        console.log(error)
-      })
-  
-    }
-  
-
     return (
       
       <Block flex middle>
@@ -112,70 +97,39 @@ class Register extends React.Component {
         <Block flex middle>
           <Block style={styles.registerContainer}>
            <ScrollView>   
-              <Block flex={0.25} middle style={styles.socialConnect, {marginTop: 15}}>
-                <Text color="#8898AA" size={12}>
-                  Sign up with
+              <Block flex={0.25} middle style={ {marginTop: 15}}>
+                <Text color="#8898AA" size={16}>
+                  Edit your Profile
                 </Text>
-                <Block row style={{ marginTop: theme.SIZES.BASE }}>
-                  
-                  <Button style={styles.socialButtons}>
-                    <Block row>
-                      <Icon
-                        name="logo-google"
-                        family="Ionicon"
-                        size={14}
-                        color={"black"}
-                        style={{ marginTop: 2, marginRight: 5 }}
-                      />
-                      <Text style={styles.socialTextButtons}>GOOGLE</Text>
-                    </Block>
-                  </Button>
-                </Block>
               </Block>
               
               <Block flex>
-                
-                <Block flex={0.17} middle>
-                  <Text color="#8898AA" size={12}>
-                    Or sign up the classic way
-                  </Text>
-                </Block>
                 <Block flex center>
                   <KeyboardAvoidingView
                     style={{ flex: 1 }}
                     behavior="padding"
                     enabled
                   >
-                    <Block width={width * 0.8} style={{ marginBottom: 15 }}>
+                    <Block width={width * 0.8} style={{ marginBottom: 10 }}>
                       <Input
                         borderless
                         placeholder="Name"
-                        name="name"
                         value={this.state.name}
                         onChange={this.changeName}
-                      />
-                    </Block>
-                    <Block width={width * 0.8} style={{ marginBottom: 15 }}>
-                      <Input
-                        borderless
-                        placeholder="Email"
-                        name="email"
-                        value={this.state.email}
-                        onChange={this.changeEmail}
                         iconContent={
                           <Icon
                             size={16}
                             color={argonTheme.COLORS.ICON}
-                            name="ic_mail_24px"
+                            name="hat-3"
                             family="ArgonExtra"
                             style={styles.inputIcons}
                           />
                         }
                       />
+                      
                       <Input
                         borderless
-                        placeholder="Phone NUmber"
-                        name="phone"
+                        placeholder="Phone Number"
                         value={this.state.phone}
                         onChange={this.changePhone}
                         iconContent={
@@ -188,13 +142,10 @@ class Register extends React.Component {
                           />
                         }
                       />
-                    </Block>
-                    <Block width={width * 0.8}>
                       <Input
                         password
                         borderless
                         placeholder="Password"
-                        name="password1"
                         value={this.state.password}
                         onChange={this.changePass1}
                         iconContent={
@@ -210,10 +161,9 @@ class Register extends React.Component {
                       <Input
                         password
                         borderless
-                        placeholder="Confirm Password"
-                        name="password2"
                         value={this.state.password2}
                         onChange={this.changePass2}
+                        placeholder="Confirm Password"
                         iconContent={
                           <Icon
                             size={16}
@@ -228,9 +178,9 @@ class Register extends React.Component {
                     </Block>
                     
                     <Block middle>
-                      <Button onPress={this.signup} color="primary" style={styles.createButton} >
+                      <Button onPress={this.save} color="primary" style={styles.createButton}>
                         <Text bold size={14} color={argonTheme.COLORS.WHITE}>
-                          CREATE ACCOUNT
+                          SAVE
                         </Text>
                       </Button>
                     </Block>
@@ -252,7 +202,7 @@ class Register extends React.Component {
 const styles = StyleSheet.create({
   registerContainer: {
     width: width * 0.9,
-    height: height * 0.8,
+    height: height * 0.6,
     backgroundColor: "#F4F5F7",
     borderRadius: 4,
     shadowColor: argonTheme.COLORS.BLACK,
@@ -302,4 +252,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Register;
+export default EditProfile;

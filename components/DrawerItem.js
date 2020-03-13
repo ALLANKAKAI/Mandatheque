@@ -6,99 +6,7 @@ import Icon from "./Icon";
 import argonTheme from "../constants/Theme";
 
 class DrawerItem extends React.Component {
-  renderIcon = () => {
-    const { title, focused } = this.props;
-
-    switch (title) {
-      case "Home":
-        return (
-          <Icon
-            name="shop"
-            family="ArgonExtra"
-            size={10}
-            color={focused ? "white" : argonTheme.COLORS.ICON}
-          />
-        );
-      case "Elements":
-        return (
-          <Icon
-            name="map-big"
-            family="ArgonExtra"
-            size={12}
-            color={focused ? "white" : argonTheme.COLORS.ICON}
-          />
-        );
-      case "Components":
-        return (
-          <Icon
-            name="map-big"
-            family="ArgonExtra"
-            size={12}
-            color={focused ? "white" : argonTheme.COLORS.ICON}
-          />
-        );
-      case "Articles":
-        return (
-          <Icon
-            name="spaceship"
-            family="ArgonExtra"
-            size={12}
-            color={focused ? "white" : argonTheme.COLORS.ICON}
-          />
-        );
-      case "Library":
-        return (
-          <Icon
-            name="spaceship"
-            family="ArgonExtra"
-            size={12}
-            color={focused ? "white" : argonTheme.COLORS.ICON}
-            />
-        );
-      case "Uploads":
-        return (
-            <Icon
-              name="spaceship"
-              family="ArgonExtra"
-              size={12}
-              color={focused ? "white" : argonTheme.COLORS.ICON}
-              />
-          );  
-      case "Profile":
-        return (
-          <Icon
-            name="chart-pie-35"
-            family="ArgonExtra"
-            size={12}
-            color={focused ? "white" : argonTheme.COLORS.ICON}
-          />
-        );
-      case "Account":
-        return (
-          <Icon
-            name="calendar-date"
-            family="ArgonExtra"
-            size={12}
-            color={focused ? "white" : argonTheme.COLORS.ICON}
-          />
-        );
-      case "Login":
-        return (
-          <Icon
-            name="calendar-date"
-            family="ArgonExtra"
-            size={12}
-            color={focused ? "white" : argonTheme.COLORS.ICON}
-          />
-        );
-      case "Getting Started":
-        return <Icon />;
-      case "Log out":
-        return <Icon />;
-      default:
-        return null;
-    }
-  };
+  
 
   render() {
     const { focused, title } = this.props;
@@ -110,9 +18,6 @@ class DrawerItem extends React.Component {
 
     return (
       <Block flex row style={containerStyles}>
-        <Block middle flex={0.1} style={{ marginRight: 5 }}>
-          {this.renderIcon()}
-        </Block>
         <Block row center flex={0.9}>
           <Text
             size={15}

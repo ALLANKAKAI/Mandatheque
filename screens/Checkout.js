@@ -5,82 +5,25 @@ import {
   Dimensions,
   StatusBar,
   ScrollView,
-  KeyboardAvoidingView,
-  AsyncStorage
+  KeyboardAvoidingView
 } from "react-native";
 
+import {
+  createStackNavigator,
+  createDrawerNavigator,
+  createAppContainer
+} from "react-navigation";
 
-import { Block,  Text, theme } from "galio-framework";
+import { Block, Checkbox, Text, theme } from "galio-framework";
 
 import { Button, Icon, Input } from "../components";
 import { Images, argonTheme } from "../constants";
-import { LOGIN_ENDPOINT } from "../constants/apis";
-import {errorAlert} from "../constants/Alerts"
 
 const { width, height } = Dimensions.get("screen");
 
-class Login extends React.Component {
-  constructor(){
-    super();
-    this.state = {
-      "email": "",
-      "password": ""
-    };
-  }
-  
-
-  changeEmail = (target) => {
-    this.setState({'email':target.nativeEvent.text});
-  }
-
-  changePass = (target) => {
-    this.setState({'password':target.nativeEvent.text});
-  }
-
-  async _onValueChange(item, selectedValue) {
-    try {
-      await AsyncStorage.setItem(item, selectedValue);
-    } catch (error) {
-      console.log('AsyncStorage error: ' + error.message);
-    }
-  }
-
-  login = () => {
-    const {navigation} = this.props;
-
-    fetch(LOGIN_ENDPOINT,
-    {
-      headers:{
-        'Accept':'application/json',
-        'Content-Type':'application/json'
-      },
-      method:'POST',
-      body:JSON.stringify(this.state)
-    })
-  .then(res => res.json())
-  .then((result) => {
-    console.log(result)
-    if(result.error){
-      errorAlert(result.error)
-      return false;
-    }
-
-    this._onValueChange('token',result.token);
-
-    navigation.navigate('Home');
-
-  })
-  .catch((error) =>{
-    console.log(error)
-  })
-  }
-
-
-
-  
+class Checkout extends React.Component {
   render() {
     const { navigation} = this.props;
-
     
     return (
       
@@ -103,12 +46,11 @@ class Login extends React.Component {
                     behavior="padding"
                     enabled
                   >
+                    
                     <Block width={width * 0.8} style={{ marginBottom: 15 }}>
                       <Input
                         borderless
                         placeholder="Email"
-                        value={this.state.email}
-                        onChange={this.changeEmail}
                         iconContent={
                           <Icon
                             size={16}
@@ -119,35 +61,28 @@ class Login extends React.Component {
                           />
                         }
                       />
-                     
-                    </Block>
-                    <Block width={width * 0.8}>
                       <Input
-                        password
                         borderless
-                        placeholder="Password"
-                        value={this.state.password}
-                        onChange={this.changePass}
+                        placeholder="Phone Number"
                         iconContent={
                           <Icon
                             size={16}
                             color={argonTheme.COLORS.ICON}
-                            name="padlock-unlocked"
+                            name="ic_mail_24px"
                             family="ArgonExtra"
                             style={styles.inputIcons}
                           />
                         }
                       />
-                    </Block>
-                    <Block row style={{ marginBottom: 15 }}>
-                      <Button onPress={this.login} color="primary" style={styles.createButton}>
-                        <Text bold size={14} color={argonTheme.COLORS.WHITE}>
-                          Log in
+                      <Text center bold size={20} color= "#0b0b0d">
+                          Amount: $200
                         </Text>
-                      </Button>
-                      <Button color="primary" style={styles.createButton} onPress={() => navigation.navigate('Account')}>
+                    </Block>
+                    
+                    <Block center style={{ marginBottom: 15 }}>
+                      <Button color="primary" style={styles.createButton}>
                         <Text bold size={14} color={argonTheme.COLORS.WHITE}>
-                          Sign Up
+                          PAY
                         </Text>
                       </Button>
                     </Block>
@@ -220,4 +155,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Login;
+export default Checkout;
