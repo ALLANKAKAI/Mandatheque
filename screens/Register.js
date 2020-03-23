@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  Alert,
   StyleSheet,
   ImageBackground,
   Dimensions,
@@ -8,12 +7,12 @@ import {
   ScrollView,
   KeyboardAvoidingView
 } from "react-native";
-import { Block, Checkbox, Text, theme } from "galio-framework";
+import { Block, Text, theme } from "galio-framework";
 
 import { Button, Icon, Input } from "../components";
 import { Images, argonTheme} from "../constants";
 import { SIGNUP_ENDPOINT } from "../constants/apis";
-import {successAlert,errorAlert} from "../constants/Alerts"
+import {successAlert,errorAlert} from "../components/Alerts"
 const { width, height } = Dimensions.get("screen");
 
 class Register extends React.Component {
@@ -57,49 +56,50 @@ class Register extends React.Component {
     }
   }
 
+  signup = () => {
+    if(this.state.password != this.state.password2){
+      errorAlert('Passwords dont match');
+      return false;
+    }
+    if(this.state.password.length < 8){
+      errorAlert('Minimun length for password is 8')
+      return false;
+    }
 
-  
+    const {navigation} = this.props;
+
+    fetch(SIGNUP_ENDPOINT,
+      {
+        headers:{
+          'Accept':'application/json',
+          'Content-Type':'application/json'
+        },
+        method:'POST',
+        body:JSON.stringify(this.state)
+      })
+    .then(res => res.json())
+    .then((result) => {
+      console.log(result)
+      if(result.error){
+        errorAlert(toString(result.error.email));
+        return false;
+      }
+
+      this._onValueChange('token',result.token);
+      successAlert('Account created successfully');
+      navigation.navigate('Home');
+
+    })
+    .catch((error) =>{
+      console.log(error);
+      errorAlert('Network Error !');
+    })
+
+  }
+
+
   render() {
     const { navigation} = this.props;
-
-    signup = () => {
-      if(this.state.password != this.state.password2){
-        errorAlert('Passwords dont match');
-        return false;
-      }
-      if(this.state.password.length < 8){
-        errorAlert('Minimun length for password is 8')
-        return false;
-      }
-  
-      fetch(SIGNUP_ENDPOINT,
-        {
-          headers:{
-            'Accept':'application/json',
-            'Content-Type':'application/json'
-          },
-          method:'POST',
-          body:JSON.stringify(this.state)
-        })
-      .then(res => res.json())
-      .then((result) => {
-        console.log(result)
-        if(result.error){
-          errorAlert(result.error.email);
-          return false;
-        }
-  
-        this._onValueChange('token',result.token);
-
-        navigation.navigate('Home');
-  
-      })
-      .catch((error) =>{
-        console.log(error)
-      })
-  
-    }
-  
 
     return (
       

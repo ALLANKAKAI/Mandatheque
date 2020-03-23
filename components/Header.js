@@ -1,6 +1,6 @@
 import React from 'react';
 import { withNavigation } from 'react-navigation';
-import { TouchableOpacity, StyleSheet, Platform, Dimensions } from 'react-native';
+import { TouchableOpacity, StyleSheet, Platform, Dimensions ,View} from 'react-native';
 import { Button, Block, NavBar, Text, theme } from 'galio-framework';
 
 
@@ -151,7 +151,7 @@ class Header extends React.Component {
   }
   render() {
     const { back, title, white, transparent, bgColor, iconColor, titleColor, navigation, ...props } = this.props;
-    const { routeName } = navigation.state;
+    const { routeName } = navigation.state;View
     const noShadow = ['Search', 'Categories', 'Deals', 'Pro', 'Profile'].includes(routeName);
     const headerStyles = [
       !noShadow ? styles.shadow : null,

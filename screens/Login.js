@@ -6,16 +6,17 @@ import {
   StatusBar,
   ScrollView,
   KeyboardAvoidingView,
-  AsyncStorage
+  AsyncStorage,
+  BackHandler
 } from "react-native";
 
 
-import { Block,  Text, theme } from "galio-framework";
+import { Block,  Text } from "galio-framework";
 
 import { Button, Icon, Input } from "../components";
 import { Images, argonTheme } from "../constants";
 import { LOGIN_ENDPOINT } from "../constants/apis";
-import {errorAlert} from "../constants/Alerts"
+import {errorAlert} from "../components/Alerts"
 
 const { width, height } = Dimensions.get("screen");
 
@@ -37,9 +38,20 @@ class Login extends React.Component {
     this.setState({'password':target.nativeEvent.text});
   }
 
-  async _onValueChange(item, selectedValue) {
+  async _setToken(item, selectedValue) {
     try {
       await AsyncStorage.setItem(item, selectedValue);
+    } catch (error) {
+      console.log('AsyncStorage error: ' + error.message);
+    }
+  }
+
+  async _removeToken() {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if(token){
+        await AsyncStorage.removeItem('token');
+      }
     } catch (error) {
       console.log('AsyncStorage error: ' + error.message);
     }
@@ -65,19 +77,22 @@ class Login extends React.Component {
       return false;
     }
 
-    this._onValueChange('token',result.token);
+    this._setToken('token',result.token);
 
     navigation.navigate('Home');
 
   })
   .catch((error) =>{
-    console.log(error)
+    console.log(error);
+    errorAlert('Network Error !');
   })
   }
 
+  componentDidMount(){
+    BackHandler.addEventListener("hardwareBackPress",()=>{return true});
+    this._removeToken();
+  }
 
-
-  
   render() {
     const { navigation} = this.props;
 

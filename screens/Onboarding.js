@@ -4,61 +4,43 @@ import {
   Image,
   StyleSheet,
   StatusBar,
-  Dimensions
+  Dimensions,
+  AsyncStorage
 } from "react-native";
 import { Block, Button, Text, theme } from "galio-framework";
-
+import { withNavigation } from 'react-navigation';
 const { height, width } = Dimensions.get("screen");
 
 import argonTheme from "../constants/Theme";
 import Images from "../constants/Images";
 
 class Onboarding extends React.Component {
+
+   checkToken = async () =>{
+      const token = await AsyncStorage.getItem('token');
+      const {navigation} = this.props;
+      if(token){
+        navigation.navigate('Home');
+        return true;
+      }
+      navigation.navigate('Login');
+  }
+
+  
+  componentDidMount(){
+    setTimeout(() => {this.checkToken()}, 3000);
+  }
+  
   render() {
-    const { navigation } = this.props;
+
 
     return (
       <Block flex style={styles.container}>
         <StatusBar hidden />
         <Block flex center>
-        <ImageBackground
-            source={Images.Onboarding}
-            style={{ height, width, zIndex: 1 }}
-          />
         </Block>
         <Block center>
-          <Image source={Images.LogoOnboarding} style={styles.logo} />
-        </Block>
-        <Block flex space="between" style={styles.padded}>
-            <Block flex space="around" style={{ zIndex: 2 }}>
-              <Block style={styles.title}>
-                <Block>
-                  <Text color="white" size={60}>
-                    Design
-                  </Text>
-                </Block>
-                <Block>
-                  <Text color="white" size={60}>
-                    System
-                  </Text>
-                </Block>
-                <Block style={styles.subTitle}>
-                  <Text color="white" size={16}>
-                    Fully coded React Native components.
-                  </Text>
-                </Block>
-              </Block>
-              <Block center>
-                <Button
-                  style={styles.button}
-                  color={argonTheme.COLORS.SECONDARY}
-                  onPress={() => navigation.navigate("Home")}
-                  textStyle={{ color: argonTheme.COLORS.BLACK }}
-                >
-                  Get Started
-                </Button>
-              </Block>
-          </Block>
+          <Image source={Images.Logo3} style={styles.logo} />
         </Block>
       </Block>
     );
@@ -67,7 +49,7 @@ class Onboarding extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.COLORS.BLACK
+    backgroundColor: theme.COLORS.WHITE
   },
   padded: {
     paddingHorizontal: theme.SIZES.BASE * 2,
@@ -83,10 +65,10 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: 200,
-    height: 60,
+    height: 120,
     zIndex: 2,
     position: 'relative',
-    marginTop: '-50%'
+    marginTop: '-120%'
   },
   title: {
     marginTop:'-5%'
@@ -96,4 +78,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Onboarding;
+export default withNavigation(Onboarding);

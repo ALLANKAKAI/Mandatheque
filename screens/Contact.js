@@ -7,16 +7,10 @@ import {
   ScrollView,
   KeyboardAvoidingView
 } from "react-native";
+import { withNavigation } from 'react-navigation';
 
-import {
-  createStackNavigator,
-  createDrawerNavigator,
-  createAppContainer
-} from "react-navigation";
+import { Block, Text} from "galio-framework";
 
-import { Block, Checkbox, Text, theme } from "galio-framework";
-
-import { Button, Icon, Input } from "../components";
 import { Images, argonTheme } from "../constants";
 
 const { width, height } = Dimensions.get("screen");
@@ -130,4 +124,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Contact;
+export default withNavigation(Contact);

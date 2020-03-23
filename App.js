@@ -11,9 +11,9 @@ import { Images, articles, argonTheme } from './constants';
 const assetImages = [
   Images.Onboarding,
   Images.LogoOnboarding,
-  Images.Logo,
+  Images.Logo2,
   Images.Pro,
-  Images.ArgonLogo,
+  Images.Logo2,
   Images.iOSLogo,
   Images.androidLogo
 ];
@@ -32,20 +32,9 @@ function cacheImages(images) {
 }
 
 export default class App extends React.Component {
-  state = {
-    isLoadingComplete: false,
-  }
   
   render() {
-    if(!this.state.isLoadingComplete) {
-      return (
-        <AppLoading
-          startAsync={this._loadResourcesAsync}
-          onError={this._handleLoadingError}
-          onFinish={this._handleFinishLoading}
-        />
-      );
-    } else {
+    
       return (
         <GalioProvider theme={argonTheme}>
           <Block flex>
@@ -53,7 +42,7 @@ export default class App extends React.Component {
           </Block>
         </GalioProvider>
       );
-    }
+    
   }
 
   _loadResourcesAsync = async () => {

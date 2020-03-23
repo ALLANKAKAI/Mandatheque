@@ -12,6 +12,7 @@ import {
 import { Block, Text, theme } from "galio-framework";
 
 import { Button } from "../components";
+import {errorAlert} from "../components/Alerts";
 import { Images} from "../constants";
 import {USER_ENDPOINT} from "../constants/apis"
 import { HeaderHeight } from "../constants/utils";
@@ -45,7 +46,8 @@ class Profile extends React.Component {
       
     })
     .catch((error) =>{
-      console.log(error)
+      console.log(error);
+      errorAlert('Network Error !');
     })
   }
 
@@ -61,8 +63,12 @@ class Profile extends React.Component {
     navigation.navigate('Login')
 }
 
+componentDidMount(){
+  this.getUser();
+}
+
   render() {
-    this.getUser();
+    
     const { navigation} = this.props;
 
     return (
@@ -284,4 +290,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Profile;
+export default withNavigation(Profile);

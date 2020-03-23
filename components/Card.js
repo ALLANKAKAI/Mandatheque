@@ -1,7 +1,7 @@
 import React from 'react';
 import { withNavigation } from 'react-navigation';
 import PropTypes from 'prop-types';
-import { StyleSheet, Dimensions, Image, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, Image, TouchableWithoutFeedback } from 'react-native';
 import { Block, Text, theme } from 'galio-framework';
 
 import { argonTheme } from '../constants';
@@ -9,8 +9,24 @@ import { ENDPOINT } from "../constants/apis";
 
 
 class Card extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {};
+    }
+
+  navigate = () =>{
+      const {navigation,edit} = this.props;
+
+      if(edit){
+        navigation.navigate('EditBook',{'item':this.props.item});
+      }
+      else{
+        navigation.navigate('SingleBook',{'item':this.props.item})
+      }
+  }
+
   render() {
-    const { navigation, item, horizontal, full, style, ctaColor, imageStyle } = this.props;
+    const { item, horizontal, full, style, imageStyle } = this.props;
     
     const imageStyles = [
       full ? styles.fullImage : styles.horizontalImage,
@@ -24,15 +40,15 @@ class Card extends React.Component {
 
     return (
       <Block row={horizontal} card flex style={cardContainer}>
-        <TouchableWithoutFeedback onPress={() => navigation.navigate('Pro')}>
+        <TouchableWithoutFeedback onPress={this.navigate}>
           <Block flex style={imgContainer}>
             <Image source={{uri: ENDPOINT + item.thumbnail}} style={imageStyles} />
           </Block>
         </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback onPress={() => navigation.navigate('Pro')}>
+        <TouchableWithoutFeedback onPress={this.navigate}>
           <Block flex space="between" style={styles.cardDescription}>
             <Text size={14} style={styles.cardTitle}>{item.name}</Text>
-            <Text size={12} muted={!ctaColor} color={ctaColor || argonTheme.COLORS.ACTIVE} bold>View Book</Text>
+            <Text size={12} color={argonTheme.COLORS.ACTIVE} bold >View Book</Text>
           </Block>
         </TouchableWithoutFeedback>
       </Block>

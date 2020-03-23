@@ -4,21 +4,22 @@ import {
   Dimensions,
   View,
   AsyncStorage,
-  Picker
+  Picker,
+  ActivityIndicator
 } from "react-native";
 
 
 //galio
-import { Text, theme } from "galio-framework";
+import { Block } from "galio-framework";
+import { withNavigation } from 'react-navigation';
 //argon
 import { argonTheme } from "../constants/";
 import { Card } from "../components/";
 import { CATEGORIES } from "../constants/categories"
 const { width } = Dimensions.get("screen");
 
-const thumbMeasure = (width - 48 - 32) / 3;
-const cardWidth = width - theme.SIZES.BASE * 2;
 import { BOOKS_ENDPOINT } from "../constants/apis";
+import {errorAlert} from "../components/Alerts"
 import GridView from "react-native-easy-grid-view";
 
 var ds = new GridView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
@@ -31,13 +32,14 @@ class Categories extends React.Component {
       dataSource: ds.cloneWithCells([], 2),
       cellWidth: 0,
       cellHeight: 0,
-      category:''
+      category:'',
+      isLoading:false
     }
 
   }
 
   _renderCell = (item) => {
-    return <Card item={item} />;
+    return <Card edit={false} item={item} />;
 
   }
 
@@ -53,7 +55,7 @@ class Categories extends React.Component {
   async fetchBooks(category) {
 
     var token = await AsyncStorage.getItem('token');
-
+    this.setState({isLoading:true});
     fetch(BOOKS_ENDPOINT+'/'+category,
       {
         headers: {
@@ -63,51 +65,68 @@ class Categories extends React.Component {
       })
       .then(res => res.json())
       .then((result) => {
+        this.setState({isLoading:false});
         if (result.results) {
           this.setState({ 'dataSource': ds.cloneWithCells(result.results, 2) });
         }
 
       })
       .catch((error) => {
-        console.log(error)
+        this.setState({isLoading:false});
+        console.log(error);
+        errorAlert('Network Error !');
       })
   }
 
 
+
   render() {
-    return <View >
-      <View style={styles.container}>
-      <Picker
-        selectedValue={this.state.category}
-        style={styles.picker}
-        onValueChange={this.changeCategory}>
-        <Picker.Item label="Choose Category" value="" />
-        {CATEGORIES.map((item, key) => {
-          return <Picker.Item key={key} label={item[1]} value={item[0]} />
-        })}
-      </Picker>
+    
+    return <View >    
+      <View  style={styles.container}>
+        <Block center>
+          <Picker
+            selectedValue={this.state.category}
+            style={styles.createButton}
+            onValueChange={this.changeCategory}>
+            <Picker.Item 
+            left
+            label="Choose Category" value="" />
+            {CATEGORIES.map((item, key) => {
+              return <Picker.Item key={key} label={item[1]} value={item[0]} />
+            })}
+          </Picker>
+        </Block>
       </View>
+      {this.state.isLoading ? <ActivityIndicator size="large" color="#0000ff" /> : null}
       <GridView dataSource={this.state.dataSource}
         spacing={8}
         style={{ padding: 16 }}
         renderCell={this._renderCell}
 
-      />
+      >
+        </GridView>
     </View>
   }
+ 
 }
 
 const styles = StyleSheet.create({
   
-  picker: {
-    width: width * 0.6,
-    marginTop: 25,
-    backgroundColor:'#999ef0'
-  },
+  
   container:{
-    justifyContent: 'center',
-    alignItems: 'center'
+    marginTop: 10,
+    height: 48,
+    width: width - 32,
+    marginHorizontal: 16,
+    borderWidth: 1,
+    borderRadius: 3,
+    borderColor: argonTheme.COLORS.BORDER
+  },
+  createButton: {
+    width: width * 0.5,
+    marginTop: 5
   }
 });
 
-export default Categories;
+export default withNavigation(Categories);

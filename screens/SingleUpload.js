@@ -7,29 +7,46 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Picker,
-  AsyncStorage
+  AsyncStorage,
+  Alert
 } from "react-native";
-import { Block, Checkbox, Text, theme } from "galio-framework";
-
-import { Button, Icon, Input } from "../components";
+import { withNavigation } from 'react-navigation';
+import { Block,Text } from "galio-framework";
+import "abort-controller/polyfill"
+import { Button,  Input } from "../components";
 import { Images, argonTheme } from "../constants";
 import { BOOKS_ENDPOINT } from "../constants/apis";
 import {CATEGORIES} from "../constants/categories";
-import {errorAlert,successAlert} from "../constants/Alerts";
+import {errorAlert,successAlert} from "../components/Alerts";
 import * as DocumentPicker from 'expo-document-picker';
 
 const { width, height } = Dimensions.get("screen");
 
+
 class SingleUpload extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       'name':'',
       'author':'',
       'category':'',
-      'pdf_file':{},
+      'pdf_file':{}
     }
   }
+
+  controller = new AbortController();
+  
+  uploadAlert = async () => {
+    Alert.alert(
+        'Uploading',
+        'Please wait ...',
+        [
+            { text: 'CANCEL', onPress: () => this.controller.abort() }
+        ],
+        {cancelable: false}
+      );
+}
+  
 
   changeName = (target) => {
     this.setState({'name':target.nativeEvent.text});
@@ -53,8 +70,8 @@ class SingleUpload extends React.Component {
 
  upload = async() => {
   var token = await AsyncStorage.getItem('token');
-  console.log(this.state)
   const data = new FormData();
+  const signal = this.controller.signal
   data.append('name',this.state.name);
   data.append('author',this.state.author);
   data.append('category',this.state.category);
@@ -63,25 +80,28 @@ class SingleUpload extends React.Component {
     type:'application/pdf',
     name:this.state.pdf_file.name})
 
+    this.uploadAlert();
     fetch(BOOKS_ENDPOINT,
       {
         headers:{
           'Authorization':`Token ${token}`
         },
         method:'POST',
-        body:data
+        body:data,
+        signal
       })
     .then(res => res.json())
     .then((result) => {
       if(result.error){
-        errorAlert(result.message);
+        errorAlert("Fill all fields");
         return false;
       }
       successAlert('Book uploaded successfully');
       
     })
     .catch((error) =>{
-      console.log(error)
+      console.log(error);
+      errorAlert('Network Error !');
     })
 }
 
@@ -117,15 +137,15 @@ class SingleUpload extends React.Component {
                           placeholder="Book Title"
                         />
                       </Block>
-                      <Block width={width * 0.8} style={{ marginBottom: 10 }}>
+                      <Block width={width * 0.8} >
                         <Input
                           value={this.state.author}
                           onChange={this.changeAuthor}
                           placeholder="Author"
                         />
                       </Block>
-                      <Block middle width={width * 0.8} style={{ marginBottom: 10 }}>
-                        <Picker
+                      <Block flex center width={width * 0.8} style={styles.picker}>
+                        <Picker 
                           selectedValue={this.state.category}
                           style={styles.createButton}
                           onValueChange={(itemValue, itemIndex) =>
@@ -138,7 +158,7 @@ class SingleUpload extends React.Component {
                           
                         </Picker>
                       </Block>
-                      <Block middle width={width * 0.8} style={{ marginBottom: 10 }}>
+                      <Block middle width={width * 0.8} style={{ marginBottom: 5 }}>
                         <Text>
                           {this.state.pdf_file.name}
                           </Text>
@@ -172,9 +192,20 @@ class SingleUpload extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  picker: {
+    width: width * 0.8,
+    marginTop: 10,
+    borderColor:"#8898AA",
+    borderRadius: 4,
+    backgroundColor: "#fff",
+    marginBottom: 10,
+    elevation: 1,
+    overflow: "hidden"
+
+  },
   registerContainer: {
     width: width * 0.9,
-    height: height * 0.8,
+    height: height * 0.6,
     backgroundColor: "#F4F5F7",
     borderRadius: 4,
     shadowColor: argonTheme.COLORS.BLACK,
@@ -220,8 +251,8 @@ const styles = StyleSheet.create({
   },
   createButton: {
     width: width * 0.5,
-    marginTop: 25
+    marginTop: 5
   }
 });
 
-export default SingleUpload;
+export default withNavigation(SingleUpload);

@@ -9,11 +9,11 @@ import {
   AsyncStorage
 } from "react-native";
 import { Block,  Text } from "galio-framework";
-
+import { withNavigation } from 'react-navigation';
 import { Button, Icon, Input } from "../components";
 import { Images, argonTheme } from "../constants";
 import {USER_ENDPOINT} from "../constants/apis"
-import { successAlert,errorAlert } from "../constants/Alerts";
+import { successAlert,errorAlert } from "../components/Alerts";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -72,15 +72,17 @@ class EditProfile extends React.Component {
     .then(res => res.json())
     .then((result) => {
       
-      if(result.error){
-        errorAlert(result.error.email);
-        return false;
+      if(result.id){
+        successAlert('Profile updated');
+        return true;
       }
-      successAlert('Profile updated')
+      errorAlert("Fill all fields");
+      
 
     })
     .catch((error) =>{
-      console.log(error)
+      console.log(error);
+      errorAlert('Network Error !');
     })
 
   }
@@ -252,4 +254,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default EditProfile;
+export default withNavigation(EditProfile);

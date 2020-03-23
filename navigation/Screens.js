@@ -6,12 +6,9 @@ import {
   createAppContainer
 } from "react-navigation";
 
-import { Block } from "galio-framework";
-
 // screens
 import Home from "../screens/Home";
 import Onboarding from "../screens/Onboarding";
-import Pro from "../screens/Pro";
 import Profile from "../screens/Profile";
 import Register from "../screens/Register";
 import Elements from "../screens/Elements";
@@ -24,9 +21,12 @@ import Subscription from "../screens/Subscription";
 import Checkout from "../screens/Checkout";
 import Contact from "../screens/Contact";
 import Categories from "../screens/Categories";
+import SingleBook from "../screens/SingleBook";
+import EditBook from "../screens/EditBook";
+import UpdateBook from "../screens/UpdateBook";
+import PDFViewer from "../screens/PdfViewer"
 
 // drawer
-import Menu from "./Menu";
 import DrawerItem from "../components/DrawerItem";
 
 // header for screens
@@ -128,6 +128,7 @@ const LibraryStack = createStackNavigator({
   transitionConfig
 });
 
+
 const UploadsStack = createStackNavigator({
   Uploads: {
     screen: Uploads,
@@ -161,27 +162,171 @@ const ProfileStack = createStackNavigator(
 );
 
 
-
-
-const HomeStack = createStackNavigator(
+const NavStack = createStackNavigator(
   {
+    Onboarding: {
+      screen: Onboarding,
+      navigationOptions: {
+        headerTransparent: true,
+        drawerLabel: () => {}
+      }
+    },
     Home: {
       screen: Home,
       navigationOptions: ({ navigation }) => ({
-        header: <Header  title="Home" navigation={navigation} />
+        header: (<Header  title="Home" navigation={navigation} />),
+        headerTransparent: true,
+        drawerLabel: ({ focused }) => (
+          <DrawerItem focused={focused} title="Home" />
+        )
       })
     },
+    Profile: {
+      screen: Profile,
+      navigationOptions: ({ navigation }) => ({
+        header: (
+          <Header  transparent title="Profile" iconColor={'#FFF'} navigation={navigation} />
+        ),
+        drawerLabel: ({ focused }) => (
+          <DrawerItem focused={focused} title="Profile" />
+        ),
+        headerTransparent: true
+      })
+    },
+    Uploads: {
+      screen: Uploads,
+      navigationOptions: ({ navigation }) => ({
+        header: <Header title="My Uploads" navigation={navigation} />,
+        headerTransparent: true,
+      })
+    },
+    Library: {
+      screen: Library,
+      navigationOptions: ({ navigation }) => ({
+        header: <Header title="Library" navigation={navigation} />,
+        headerTransparent: true,
+      })
+    },
+    Subscription: {
+      screen: Subscription,
+      navigationOptions: ({ navigation }) => ({
+        header: <Header title="Subscription" navigation={navigation} />,
+        headerTransparent: true,
+      })
+    },
+    Categories: {
+      screen: Categories,
+      navigationOptions: ({ navigation }) => ({
+        header: <Header title="Categories" navigation={navigation} />,
+        headerTransparent: true,
+      })
+    },
+    Elements: {
+      screen: Elements,
+      navigationOptions: ({ navigation }) => ({
+        header: <Header title="Elements" navigation={navigation} />,
+        headerTransparent: true,
+      })
+    },
+    SingleBook: {
+      screen: SingleBook,
+      navigationOptions: navOpt => ({
+        drawerLabel: ({ focused }) => (
+          <DrawerItem focused={focused} screen="SingleBook" title="Single Book" />
+        )
+      })
+    },
+    EditBook: {
+      screen: EditBook,
+      navigationOptions: navOpt => ({
+        drawerLabel: ({ focused }) => (
+          <DrawerItem focused={focused} screen="EditBook" title="Edit Book" />
+        )
+      })
+    },
+    UpdateBook: {
+      screen: UpdateBook,
+      navigationOptions: navOpt => ({
+        drawerLabel: ({ focused }) => (
+          <DrawerItem focused={focused} screen="UpdateBook" title="Update Book" />
+        )
+      })
+    },
+    Contact: {
+      screen: Contact,
+      navigationOptions: navOpt => ({
+        headerTransparent: true,
+        drawerLabel: ({ focused }) => (
+          <DrawerItem focused={focused} screen="Contact" title="Contact Us" />
+        )
+      })
+    },
+    Login: {
+      screen: Login,
+      navigationOptions: navOpt => ({
+        headerTransparent: true,
+        drawerLabel: ({ focused }) => (
+          <DrawerItem focused={focused} screen="Login" title="Sign Out" />
+        )
+      })
+    },
+    SingleUpload: {
+      screen: SingleUpload,
+      navigationOptions: navOpt => ({
+        headerTransparent: true,
+        drawerLabel: ({ focused }) => (
+          <DrawerItem focused={focused} screen="SingleUpload" title="SingleUpload" />
+        )
+      })
+    },
+    EditProfile: {
+      screen: EditProfile,
+      navigationOptions: navOpt => ({
+        headerTransparent: true,
+        drawerLabel: ({ focused }) => (
+          <DrawerItem focused={focused} screen="EditProfile" title="EditProfile" />
+        )
+      })
+    },
+    PDFViewer: {
+      screen: PDFViewer,
+      navigationOptions: ({navigation}) => ({
+        header: <Header  title="PDF" navigation={navigation} />,
+        headerTransparent: true,
+        drawerLabel: ({ focused }) => (
+          <DrawerItem focused={focused} screen="PDFViewer" title="PDF" />
+        )
+      })
+    },
+    Account: {
+      screen: Register,
+      navigationOptions: navOpt => ({
+        headerTransparent: true,
+        drawerLabel: ({ focused }) => (
+          <DrawerItem focused={focused} screen="Register" title="Account" />
+        )
+      })
+    }, 
+    Checkout: {
+      screen: Checkout,
+      navigationOptions: navOpt => ({
+        headerTransparent: true,
+        drawerLabel: ({ focused }) => (
+          <DrawerItem focused={focused} screen="Checkout" title="Checkout" />
+        )
+      })
+    }
   },
   {
-    cardStyle: {
-      backgroundColor: "#F8F9FE"
-    },
-    transitionConfig
+    initialRouteName: 'Onboarding',
+    headerMode: 'screen',
   }
 );
 
+
+
 // divideru se baga ca si cum ar fi un ecrna dar nu-i nimic duh
-const AppStack = createDrawerNavigator(
+/* const AppStack = createDrawerNavigator(
   {
     Onboarding: {
       screen: Onboarding,
@@ -191,7 +336,7 @@ const AppStack = createDrawerNavigator(
     },
     Home: {
       screen: HomeStack,
-      navigationOptions: navOpt => ({
+      navigationOptions: ({ navigation }) => ({
         drawerLabel: ({ focused }) => (
           <DrawerItem focused={focused} title="Home" />
         )
@@ -199,15 +344,39 @@ const AppStack = createDrawerNavigator(
     },
     Library: {
       screen: LibraryStack,
-      navigationOptions: navOpt => ({
+      navigationOptions: ({ navigation }) => ({
         drawerLabel: ({ focused }) => (
           <DrawerItem focused={focused} screen="Library" title="My Library" />
         )
       })
     },
+    SingleBook: {
+      screen: SingleBook,
+      navigationOptions: navOpt => ({
+        drawerLabel: ({ focused }) => (
+          <DrawerItem focused={focused} screen="SingleBook" title="Single Book" />
+        )
+      })
+    },
+    EditBook: {
+      screen: EditBook,
+      navigationOptions: navOpt => ({
+        drawerLabel: ({ focused }) => (
+          <DrawerItem focused={focused} screen="EditBook" title="Edit Book" />
+        )
+      })
+    },
+    UpdateBook: {
+      screen: UpdateBook,
+      navigationOptions: navOpt => ({
+        drawerLabel: ({ focused }) => (
+          <DrawerItem focused={focused} screen="UpdateBook" title="Update Book" />
+        )
+      })
+    },
     Categories: {
       screen: CategoriesStack,
-      navigationOptions: navOpt => ({
+      navigationOptions: ({ navigation }) => ({
         drawerLabel: ({ focused }) => (
           <DrawerItem focused={focused} screen="Categories" title="Categories" />
         )
@@ -215,7 +384,7 @@ const AppStack = createDrawerNavigator(
     },
     Uploads: {
       screen: UploadsStack,
-      navigationOptions: navOpt => ({
+      navigationOptions: ({ navigation }) => ({
         drawerLabel: ({ focused }) => (
           <DrawerItem focused={focused} screen="Uploads" title="My Uploads" />
         )
@@ -223,7 +392,7 @@ const AppStack = createDrawerNavigator(
     },
     Subscription: {
       screen: SubscriptionStack,
-      navigationOptions: navOpt => ({
+      navigationOptions: ({ navigation }) => ({
         drawerLabel: ({ focused }) => (
           <DrawerItem focused={focused} screen="Subscription" title="My Subscription"/>
         )
@@ -231,7 +400,7 @@ const AppStack = createDrawerNavigator(
     },
     Profile: {
       screen: ProfileStack,
-      navigationOptions: navOpt => ({
+      navigationOptions: ({ navigation }) => ({
         drawerLabel: ({ focused }) => (
           <DrawerItem focused={focused} screen="Profile" title="Profile" />
         )
@@ -269,6 +438,15 @@ const AppStack = createDrawerNavigator(
         )
       })
     },
+    PDFViewer: {
+      screen: PDFViewer,
+      navigationOptions: ({navigation}) => ({
+        header: <Header  title="PDF" navigation={navigation} />,
+        drawerLabel: ({ focused }) => (
+          <DrawerItem focused={focused} screen="PDFViewer" title="PDF" />
+        )
+      })
+    },
     Account: {
       screen: Register,
       navigationOptions: navOpt => ({
@@ -276,9 +454,7 @@ const AppStack = createDrawerNavigator(
           <DrawerItem focused={focused} screen="Register" title="Account" />
         )
       })
-    },
-    
-    
+    }, 
     Checkout: {
       screen: Checkout,
       navigationOptions: navOpt => ({
@@ -289,7 +465,7 @@ const AppStack = createDrawerNavigator(
     },
     Elements: {
       screen: ElementsStack,
-      navigationOptions: navOpt => ({
+      navigationOptions: ({ navigation }) => ({
         drawerLabel: ({ focused }) => (
           <DrawerItem focused={focused} screen="Elements" title="Elements" />
         )
@@ -298,6 +474,38 @@ const AppStack = createDrawerNavigator(
     
   },
   Menu
+);
+*/
+
+const AppStack = createDrawerNavigator(
+  {
+    Menu: {
+      screen: NavStack,
+    },
+    Home: {
+      screen: Home,
+    },
+    Library:{
+      screen:Library,
+    },
+    Uploads:{
+      screen: Uploads
+    },
+    Subscription:{
+      
+      screen: Subscription
+    },
+    Profile:{
+      screen:Profile
+    },
+    Contact:{
+      screen: Contact
+    },
+    Logout:{
+      screen: Login
+    }
+     
+  }
 );
 
 const AppContainer = createAppContainer(AppStack);

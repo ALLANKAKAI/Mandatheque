@@ -1,13 +1,14 @@
 import React from 'react';
-import { StyleSheet, Dimensions,AsyncStorage,View } from 'react-native';
+import { StyleSheet, Dimensions,AsyncStorage,ScrollView,ActivityIndicator,View} from 'react-native';
 import { Block, theme,Button,Text } from 'galio-framework';
-
+import { withNavigation } from 'react-navigation';
 import { Card } from '../components';
 import Icon from '../components/Icon';
 import Input from '../components/Input';
 import GridView from "react-native-easy-grid-view";
 import { BOOKS_ENDPOINT } from "../constants/apis";
 import argonTheme from '../constants/Theme';
+import {errorAlert} from "../components/Alerts"
 
 var ds = new GridView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
 const { height, width } = Dimensions.get('window');
@@ -21,13 +22,14 @@ class Home extends React.Component {
         dataSource:ds.cloneWithCells([],2),
         cellWidth: 0,
         cellHeight: 0,
-        search:''
+        search:'',
+        isLoading:false
       }
       
     }
 
   _renderCell = (item) => {
-    return <Card  item={item} />;
+    return <Card edit={false}  item={item} />;
    
 }
 
@@ -39,6 +41,7 @@ class Home extends React.Component {
     if(search){
       endpoint = BOOKS_ENDPOINT+'?s='+search
     }
+    this.setState({isLoading:true});
     fetch(endpoint,
       {
         headers:{
@@ -48,6 +51,7 @@ class Home extends React.Component {
       })
     .then(res => res.json())
     .then((result) => {
+      this.setState({isLoading:false});
       if(result.books){
         
       this.setState({'dataSource':ds.cloneWithCells(result.books,2)});
@@ -55,7 +59,9 @@ class Home extends React.Component {
       
     })
     .catch((error) =>{
-      console.log(error)
+      this.setState({isLoading:false});
+      console.log(error);
+      errorAlert('Network Error !');
     })
   }
 
@@ -66,7 +72,6 @@ class Home extends React.Component {
     }
   }
 
-
   componentDidMount(){
     this.fetchBooks();
   }
@@ -74,7 +79,7 @@ class Home extends React.Component {
   render() {
     const { navigation } = this.props;
 
-    return <View>
+    return <ScrollView>
        <Input
         right
         color="black"
@@ -87,7 +92,7 @@ class Home extends React.Component {
         iconContent={<Icon size={16} color={theme.COLORS.MUTED} name="search-zoom-in" family="ArgonExtra" />}
       />
       <Block  middle row style={styles.options}>
-        <Button shadowless style={[styles.tab, styles.divider]} onPress={() => navigation.navigate('Pro')}>
+        <Button shadowless style={[styles.tab, styles.divider]} onPress={() => this.fetchBooks()}>
           <Block row middle>
             <Text size={20} style={styles.tabTitle}>{'All Books'}</Text>
           </Block>
@@ -98,12 +103,13 @@ class Home extends React.Component {
           </Block>
         </Button>
       </Block>
+      {this.state.isLoading ? <ActivityIndicator size="large" color="#0000ff" /> : null}
               <GridView dataSource={this.state.dataSource}
               spacing={8}
               style={{padding:16}}
               renderCell={this._renderCell}
             />
-        </View>
+        </ScrollView>
   }
 }
 
@@ -178,4 +184,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Home;
+export default withNavigation(Home);

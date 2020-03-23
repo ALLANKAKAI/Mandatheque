@@ -6,11 +6,14 @@ const ProfileBackground = require("../assets/imgs/profile-screen-bg.png");
 const RegisterBackground = require("../assets/imgs/register-bg.png");
 const Pro = require("../assets/imgs/getPro-bg.png");
 const ArgonLogo = require("../assets/imgs/argonlogo.png");
+const Logo2 = require("../assets/imgs/logo2.png");
+const Logo3 = require("../assets/imgs/logo3.png");
 const iOSLogo = require("../assets/imgs/ios.png");
 const androidLogo = require("../assets/imgs/android.png");
 // internet imgs
 
 const ProfilePicture = 'https://images.unsplash.com/photo-1492633423870-43d1cd2775eb?fit=crop&w=1650&q=80';
+
 
 const Viewed = [
   'https://images.unsplash.com/photo-1501601983405-7c7cabaa1581?fit=crop&w=240&q=80',
@@ -27,6 +30,8 @@ const Products = {
 
 export default {
   Onboarding,
+  Logo2,
+  Logo3,
   Logo,
   LogoOnboarding,
   ProfileBackground,

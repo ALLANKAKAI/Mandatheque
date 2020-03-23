@@ -2,102 +2,145 @@ import React from "react";
 import {
   ScrollView,
   StyleSheet,
-  Image,
-  TouchableWithoutFeedback,
-  ImageBackground,
-  Dimensions
+  Dimensions,
+  AsyncStorage
 } from "react-native";
+import { withNavigation } from 'react-navigation';
+
 //galio
-import { Block, Text, theme } from "galio-framework";
+import {  Text, theme } from "galio-framework";
 //argon
-import { articles, Images, argonTheme } from "../constants/";
-import { Card } from "../components/";
+import {  argonTheme } from "../constants/";
+import {  Card } from "../components/";
 
 const { width } = Dimensions.get("screen");
 
+const thumbMeasure = (width - 48 - 32) / 3;
+const cardWidth = width - theme.SIZES.BASE * 2;
+import { UPLOADS_ENDPOINT } from "../constants/apis";
+import {errorAlert} from "../components/Alerts";
+import GridView from "react-native-easy-grid-view";
+var ds = new GridView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
 
 class Library extends React.Component {
-  renderProduct = (item, index) => {
-    const { navigation } = this.props;
+  constructor() {
+    super();
+    
+    this.state = {
+      dataSource: ds.cloneWithCells([], 2),
+      cellWidth: 0,
+      cellHeight: 0
+    }
 
-    return (
-      <TouchableWithoutFeedback
-        style={{ zIndex: 3 }}
-        key={`product-${item.title}`}
-        onPress={() => navigation.navigate("", { product: item })}
-      >
-        <Block center style={styles.productItem}>
-          <Image
-            resizeMode="cover"
-            style={styles.productImage}
-            source={{ uri: item.image }}
-          />
-          <Block center style={{ paddingHorizontal: theme.SIZES.BASE }}>
-            <Text
-              center
-              size={16}
-              color={theme.COLORS.MUTED}
-              style={styles.productPrice}
-            >
-              {item.price}
-            </Text>
-            <Text center size={34}>
-              {item.title}
-            </Text>
-            <Text
-              center
-              size={16}
-              color={theme.COLORS.MUTED}
-              style={styles.productDescription}
-            >
-              {item.description}
-            </Text>
-          </Block>
-        </Block>
-      </TouchableWithoutFeedback>
-    );
-  };
+  }
 
-  renderCards = () => {
-    return (
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.articles}>
-        <Block flex> 
-          <Block flex row>
-            <Card item={articles[1]} style={{ marginRight: theme.SIZES.BASE }} />
-            <Card item={articles[2]} />
-          </Block>  
-        </Block>
-        <Block flex> 
-          <Block flex row>
-            <Card item={articles[1]} style={{ marginRight: theme.SIZES.BASE }} />
-            <Card item={articles[2]} />
-          </Block>  
-        </Block>
-      </ScrollView>
-    )
-  };
+  _renderCell = (item) => {
+    return <Card edit={false} item={item} />;
 
-  
+  }
+
+  async fetchBooks() {
+
+    var token = await AsyncStorage.getItem('token');
+    
+    fetch(UPLOADS_ENDPOINT,
+      {
+        headers: {
+          'Authorization': `Token ${token}`
+        },
+        method: 'GET'
+      })
+      .then(res => res.json())
+      .then((result) => {
+        if (result.books) {
+          this.setState({ 'dataSource': ds.cloneWithCells(result.books, 2) });
+        }
+
+      })
+      .catch((error) => {
+        console.log(error);
+        errorAlert('Network Error !');
+      })
+  }
+
+  componentDidMount() {
+    this.fetchBooks();
+  }
+
 
   render() {
-    return (
-      <Block flex center style={styles.home}>
-        {this.renderCards()}
-      </Block>
-    );
+    return <ScrollView>
+      <Text center bold size={16} style={styles.title}>
+            My Library
+          </Text>
+      <GridView dataSource={this.state.dataSource}
+        spacing={8}
+        style={{ padding: 16 }}
+        renderCell={this._renderCell}
+
+      />
+    </ScrollView>
   }
 }
 
 const styles = StyleSheet.create({
-  home: {
-    width: width,    
+  title: {
+    paddingBottom: theme.SIZES.BASE,
+    paddingHorizontal: theme.SIZES.BASE * 2,
+    marginTop: 22,
+    color: argonTheme.COLORS.HEADER
   },
-  articles: {
-    width: width - theme.SIZES.BASE * 2,
-    paddingVertical: theme.SIZES.BASE,
+  group: {
+    paddingTop: theme.SIZES.BASE
+  },
+  albumThumb: {
+    borderRadius: 4,
+    marginVertical: 4,
+    alignSelf: "center",
+    width: thumbMeasure,
+    height: thumbMeasure
+  },
+  category: {
+    backgroundColor: theme.COLORS.WHITE,
+    marginVertical: theme.SIZES.BASE / 2,
+    borderWidth: 0
+  },
+  categoryTitle: {
+    height: "100%",
+    paddingHorizontal: theme.SIZES.BASE,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  imageBlock: {
+    overflow: "hidden",
+    borderRadius: 4
+  },
+  productItem: {
+    width: cardWidth - theme.SIZES.BASE * 2,
+    marginHorizontal: theme.SIZES.BASE,
+    shadowColor: "black",
+    shadowOffset: { width: 0, height: 7 },
+    shadowRadius: 10,
+    shadowOpacity: 0.2
+  },
+  productImage: {
+    width: cardWidth - theme.SIZES.BASE,
+    height: cardWidth - theme.SIZES.BASE,
+    borderRadius: 3
+  },
+  productPrice: {
+    paddingTop: theme.SIZES.BASE,
+    paddingBottom: theme.SIZES.BASE / 2
+  },
+  productDescription: {
+    paddingTop: theme.SIZES.BASE
+    // paddingBottom: theme.SIZES.BASE * 2,
+  },
+  button: {
+    marginBottom: theme.SIZES.BASE,
+    width: width - theme.SIZES.BASE * 2
   },
 });
 
-export default Library;
+export default withNavigation(Library);

@@ -2,20 +2,18 @@ import React from "react";
 import {
   ScrollView,
   StyleSheet,
-  Image,
-  TouchableWithoutFeedback,
-  ImageBackground,
   Dimensions,
-  View,
-  AsyncStorage
+  AsyncStorage,
+  ActivityIndicator
 } from "react-native";
-
+import { withNavigation } from 'react-navigation';
 
 //galio
 import { Block, Text, theme } from "galio-framework";
 //argon
-import { articles, Images, argonTheme } from "../constants/";
+import {  argonTheme } from "../constants/";
 import { Button, Card } from "../components/";
+import {errorAlert} from "../components/Alerts";
 
 const { width } = Dimensions.get("screen");
 
@@ -32,20 +30,21 @@ class Uploads extends React.Component {
     this.state = {
       dataSource: ds.cloneWithCells([], 2),
       cellWidth: 0,
-      cellHeight: 0
+      cellHeight: 0,
+      isLoading:false
     }
 
   }
 
   _renderCell = (item) => {
-    return <Card item={item} />;
+    return <Card edit={true} item={item} />;
 
   }
 
   async fetchBooks() {
 
     var token = await AsyncStorage.getItem('token');
-    
+    this.setState({isLoading:true});
     fetch(UPLOADS_ENDPOINT,
       {
         headers: {
@@ -55,13 +54,16 @@ class Uploads extends React.Component {
       })
       .then(res => res.json())
       .then((result) => {
+        this.setState({isLoading:false});
         if (result.books) {
           this.setState({ 'dataSource': ds.cloneWithCells(result.books, 2) });
         }
 
       })
       .catch((error) => {
-        console.log(error)
+        this.setState({isLoading:false});
+        console.log(error);
+        errorAlert('Network Error !');
       })
   }
 
@@ -69,19 +71,29 @@ class Uploads extends React.Component {
     this.fetchBooks();
   }
 
+  
+  
 
   render() {
-    return <View>
+    const { navigation} = this.props;
+    return <ScrollView>
       <Text center bold size={16} style={styles.title}>
             My Uploads
           </Text>
+         
+      <Block center>
+        <Button color="default" style={styles.button} onPress={() => navigation.navigate('SingleUpload')}>
+          CLICK HERE TO UPLOAD!
+        </Button>
+      </Block>
+      {this.state.isLoading ? <ActivityIndicator size="large" color="#0000ff" />:null}
       <GridView dataSource={this.state.dataSource}
         spacing={8}
         style={{ padding: 16 }}
         renderCell={this._renderCell}
 
       />
-    </View>
+    </ScrollView>
   }
 }
 
@@ -145,4 +157,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Uploads;
+export default withNavigation(Uploads);
