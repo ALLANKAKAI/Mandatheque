@@ -28,7 +28,7 @@ class Onboarding extends React.Component {
 
   
   componentDidMount(){
-    setTimeout(() => {this.checkToken()}, 3000);
+    setTimeout(() => {this.checkToken()}, 2000);
   }
   
   render() {

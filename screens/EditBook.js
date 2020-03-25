@@ -21,8 +21,20 @@ const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
 
 class EditBook extends React.Component {
+  constructor(props){
+    super(props);
+    const {navigation} = this.props;
+    this.state = {
+      author:navigation.state.params.item.author,
+      name:navigation.state.params.item.name,
+      category:navigation.state.params.item.category,
+      thumbnail:navigation.state.params.item.thumbnail
+    }
+  }
 
-
+  updateDetails = (obj) =>{
+    this.setState(obj);
+  }
 
     deleteBook = () => {
         Alert.alert(
@@ -57,8 +69,9 @@ class EditBook extends React.Component {
               errorAlert(result.error);
               return false;
             }
-            delete this.props.state.params.item;
+            //delete this.props.state.params.item;
             successAlert('Book deleted successfully');
+            this.props.navigation.state.params.removeBook(item.id);
             navigation.navigate('Uploads');
       
           })
@@ -85,7 +98,7 @@ class EditBook extends React.Component {
               <Block flex style={styles.profileCard}>
                 <Block middle style={styles.avatarContainer}>
                   <Image
-                    source={{ uri: ENDPOINT+item.thumbnail }}
+                    source={{ uri: ENDPOINT+this.state.thumbnail }}
                     style={styles.avatar}
                   />
                 </Block>
@@ -95,16 +108,16 @@ class EditBook extends React.Component {
                    
                     <Text  size={16} color="#32325D">
                         Book Title:  
-                        <Text bold size={20} color="#32325D"> {item.name}</Text>
+                        <Text bold size={20} color="#32325D"> {this.state.name}</Text>
                     </Text>
                        
                     <Text  size={16} color="#32325D" style={{ marginTop: 10 }}>
                       Author:
-                      <Text bold size={20} color="#32325D"> {item.author} </Text>
+                      <Text bold size={20} color="#32325D"> {this.state.author} </Text>
                     </Text>
                     <Text  size={16} color="#32325D" style={{ marginTop: 10 }}>
                       Category:
-                      <Text bold size={20} color="#32325D"> {item.category} </Text>
+                      <Text bold size={20} color="#32325D"> {this.state.category} </Text>
                     </Text>
                   </Block>
                   <Block middle style={{ marginTop: 30, marginBottom: 16 }}>
@@ -117,7 +130,7 @@ class EditBook extends React.Component {
                         <Button color="default" style={styles.button}>
                             Read Book
                         </Button>
-                        <Button  style={styles.edit} onPress={() => navigation.navigate('UpdateBook',{'item':item})} >
+                        <Button  style={styles.edit} onPress={() => navigation.navigate('UpdateBook',{'item':item,'updateBook':this.props.navigation.state.params.updateBook,'updateDetails':this.updateDetails})} >
                             Edit Book
                         </Button>
                         <Button onPress={this.deleteBook} color="error" style={styles.button} >

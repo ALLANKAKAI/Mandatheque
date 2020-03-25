@@ -28,7 +28,7 @@ class Uploads extends React.Component {
     super();
     
     this.state = {
-      dataSource: ds.cloneWithCells([], 2),
+      books: [],
       cellWidth: 0,
       cellHeight: 0,
       isLoading:false
@@ -37,8 +37,26 @@ class Uploads extends React.Component {
   }
 
   _renderCell = (item) => {
-    return <Card edit={true} item={item} />;
+    return <Card edit={true} updateBook={this.updateBook} removeBook={this.removeBook} item={item} />;
 
+  }
+
+  removeBook = (id) =>{
+    let books = this.state.books
+    books.splice(books.findIndex(x => x.id == id), 1);
+    this.setState({books:books});
+  }
+
+  updateBook = (item) =>{
+    let books = this.state.books
+    books.splice(books.findIndex(x => x.id == item.id), 1,item);
+    this.setState({books:books});
+  }
+
+  addBook = (item) =>{
+    let books = this.state.books
+    books.unshift(item);
+    this.setState({books:books});
   }
 
   async fetchBooks() {
@@ -56,7 +74,7 @@ class Uploads extends React.Component {
       .then((result) => {
         this.setState({isLoading:false});
         if (result.books) {
-          this.setState({ 'dataSource': ds.cloneWithCells(result.books, 2) });
+          this.setState({ 'books':result.books });
         }
 
       })
@@ -71,9 +89,6 @@ class Uploads extends React.Component {
     this.fetchBooks();
   }
 
-  
-  
-
   render() {
     const { navigation} = this.props;
     return <ScrollView>
@@ -82,12 +97,12 @@ class Uploads extends React.Component {
           </Text>
          
       <Block center>
-        <Button color="default" style={styles.button} onPress={() => navigation.navigate('SingleUpload')}>
+        <Button color="default" style={styles.button} onPress={() => navigation.navigate('SingleUpload',{'addBook':this.addBook})}>
           CLICK HERE TO UPLOAD!
         </Button>
       </Block>
       {this.state.isLoading ? <ActivityIndicator size="large" color="#0000ff" />:null}
-      <GridView dataSource={this.state.dataSource}
+      <GridView dataSource={ds.cloneWithCells(this.state.books, 2)}
         spacing={8}
         style={{ padding: 16 }}
         renderCell={this._renderCell}

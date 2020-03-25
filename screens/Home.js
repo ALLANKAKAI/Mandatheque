@@ -19,7 +19,7 @@ class Home extends React.Component {
       super();
      
       this.state = {
-        dataSource:ds.cloneWithCells([],2),
+        books:[],
         cellWidth: 0,
         cellHeight: 0,
         search:'',
@@ -29,9 +29,8 @@ class Home extends React.Component {
     }
 
   _renderCell = (item) => {
-    return <Card edit={false}  item={item} />;
-   
-}
+    return <Card edit={false} item={item} />;
+   }
 
   async fetchBooks(search=null) {
 
@@ -54,7 +53,7 @@ class Home extends React.Component {
       this.setState({isLoading:false});
       if(result.books){
         
-      this.setState({'dataSource':ds.cloneWithCells(result.books,2)});
+      this.setState({books:result.books});
       }
       
     })
@@ -104,7 +103,7 @@ class Home extends React.Component {
         </Button>
       </Block>
       {this.state.isLoading ? <ActivityIndicator size="large" color="#0000ff" /> : null}
-              <GridView dataSource={this.state.dataSource}
+              <GridView dataSource={ds.cloneWithCells(this.state.books,2)}
               spacing={8}
               style={{padding:16}}
               renderCell={this._renderCell}

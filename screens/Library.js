@@ -27,7 +27,7 @@ class Library extends React.Component {
     super();
     
     this.state = {
-      dataSource: ds.cloneWithCells([], 2),
+      books: [],
       cellWidth: 0,
       cellHeight: 0
     }
@@ -35,32 +35,24 @@ class Library extends React.Component {
   }
 
   _renderCell = (item) => {
-    return <Card edit={false} item={item} />;
+    return <Card edit={false} removeBook={this.removeBook} item={item} />;
 
   }
 
-  async fetchBooks() {
+  removeBook = (id) =>{
+    let books = this.state.books
+    books.splice(books.findIndex(x => x.id == id), 1);
+    this.setState({books:books});
+  }
 
-    var token = await AsyncStorage.getItem('token');
-    
-    fetch(UPLOADS_ENDPOINT,
-      {
-        headers: {
-          'Authorization': `Token ${token}`
-        },
-        method: 'GET'
-      })
-      .then(res => res.json())
-      .then((result) => {
-        if (result.books) {
-          this.setState({ 'dataSource': ds.cloneWithCells(result.books, 2) });
-        }
+ fetchBooks = async() => {
 
-      })
-      .catch((error) => {
-        console.log(error);
-        errorAlert('Network Error !');
-      })
+    let books = await AsyncStorage.getItem('books');
+    if (books){
+      books =  JSON.parse(books);
+      console.log(books);
+      this.setState({books:books});
+    }
   }
 
   componentDidMount() {
@@ -73,7 +65,7 @@ class Library extends React.Component {
       <Text center bold size={16} style={styles.title}>
             My Library
           </Text>
-      <GridView dataSource={this.state.dataSource}
+      <GridView dataSource={ds.cloneWithCells(this.state.books, 2)}
         spacing={8}
         style={{ padding: 16 }}
         renderCell={this._renderCell}

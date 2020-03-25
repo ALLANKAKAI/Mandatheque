@@ -5,14 +5,15 @@ import {
   Dimensions,
   ScrollView,
   Image,
-  Platform
+  Platform,
+  AsyncStorage
 } from "react-native";
 import { Block, Text, theme } from "galio-framework";
 
 import { Button } from "../components";
-import { Images} from "../constants";
 import {ENDPOINT} from "../constants/apis"
 import { HeaderHeight } from "../constants/utils";
+import {successAlert} from "../components/Alerts"
 
 const { width, height } = Dimensions.get("screen");
 
@@ -20,6 +21,57 @@ const thumbMeasure = (width - 48 - 32) / 3;
 
 class SingleBook extends React.Component {
 
+  constructor(){
+    super();
+    this.state = {
+      saved:false
+    }
+  }
+
+
+  saveBook = async () =>{
+    let books = await AsyncStorage.getItem('books');
+    const item = this.props.navigation.state.params.item;
+
+    if(books){
+      books = JSON.parse(books);
+      books.push(item);
+    }
+    else{
+      books = [item]
+    }
+    await AsyncStorage.setItem('books',JSON.stringify(books));
+    this.setState({saved:true});
+    
+  }
+
+  unsaveBook = async () =>{
+    let books = await AsyncStorage.getItem('books');
+    books = JSON.parse(books);
+    const item = this.props.navigation.state.params.item
+    books.splice(books.findIndex(x => x.id == item.id), 1);
+
+    books = JSON.stringify(books);
+    await AsyncStorage.setItem('books',books);
+    this.setState({saved:false});
+    this.props.navigation.state.params.removeBook(item.id);
+  }
+
+  checkSaved = async () =>{
+    let books = await AsyncStorage.getItem('books');
+    const item = this.props.navigation.state.params.item;
+    if(books){
+      books = JSON.parse(books);
+      if(books.find(x => x.id == item.id)){
+        this.setState({saved:true});
+      }
+    }
+  }
+
+
+  componentDidMount(){
+    this.checkSaved();
+  }
   
   render() {
     const { navigation} = this.props;
@@ -36,7 +88,7 @@ class SingleBook extends React.Component {
               <Block flex style={styles.profileCard}>
                 <Block middle style={styles.avatarContainer}>
                   <Image
-                    source={{ uri: ENDPOINT+item.thumbnail }}
+                    source={{ uri: ENDPOINT+item.thumbnail,cache: 'only-if-cached' }}
                     style={styles.avatar}
                   />
                 </Block>
@@ -66,9 +118,11 @@ class SingleBook extends React.Component {
                       <Button onPress={()=> navigation.navigate('PDFViewer',{'item':item})} color="error" style={styles.button} >
                             Read Book
                         </Button>
-                        <Button color="default" style={styles.button} >
-                            Save Book
-                        </Button>
+                        {this.state.saved ? <Button onPress={this.unsaveBook}  style={styles.button} >
+      Unsave Book
+  </Button> : <Button onPress={this.saveBook} color="default" style={styles.button} >
+    Save Book
+</Button> }
                         
                       </Block>
                       
@@ -114,6 +168,9 @@ const styles = StyleSheet.create({
   },
   info: {
     paddingHorizontal: 40
+  },
+  unsave:{
+    backgroundColor:'#C0C0C0'
   },
   avatarContainer: {
     position: "relative",

@@ -7,11 +7,12 @@ import {
     ScrollView,
     KeyboardAvoidingView,
     Picker,
-    AsyncStorage
+    AsyncStorage,
+    Alert
 } from "react-native";
 import { withNavigation } from 'react-navigation';
-import { Block, Text} from "galio-framework";
-
+import { Block, Text } from "galio-framework";
+import "abort-controller/polyfill";
 import { Button, Icon, Input } from "../components";
 import { Images, argonTheme } from "../constants";
 import { BOOK_ENDPOINT, ENDPOINT } from "../constants/apis";
@@ -38,7 +39,20 @@ class UpdateBook extends React.Component {
             }
         }
     }
-    
+
+    controller = new AbortController();
+
+    uploadAlert = async () => {
+        Alert.alert(
+            'Updating',
+            'Please wait ...',
+            [
+                { text: 'CANCEL', onPress: () => this.controller.abort() }
+            ],
+            { cancelable: false }
+        );
+    }
+
 
     changeName = (target) => {
         this.setState({ 'name': target.nativeEvent.text });
@@ -54,7 +68,7 @@ class UpdateBook extends React.Component {
 
     _pickDocument = async () => {
         let result = await DocumentPicker.getDocumentAsync({ type: 'application/pdf' });
-        
+
         if (result.type == 'success') {
             this.setState({ 'pdf_file': result })
         }
@@ -62,7 +76,8 @@ class UpdateBook extends React.Component {
 
     upload = async () => {
         var token = await AsyncStorage.getItem('token');
-        
+        const signal = this.controller.signal;
+
         const data = new FormData();
         data.append('name', this.state.name);
         data.append('author', this.state.author);
@@ -73,18 +88,22 @@ class UpdateBook extends React.Component {
             name: this.state.pdf_file.name
         })
 
+        this.uploadAlert();
         fetch(BOOK_ENDPOINT + '/' + this.state.id,
             {
                 headers: {
                     'Authorization': `Token ${token}`
                 },
                 method: 'PUT',
-                body: data
+                body: data,
+                signal
             })
             .then(res => res.json())
             .then((result) => {
                 if (result.id) {
                     successAlert('Book updated successfully');
+                    this.props.navigation.state.params.updateDetails(result);
+                    this.props.navigation.state.params.updateBook(result);
                     return true;
                 }
                 errorAlert("Fill all fields");
@@ -160,7 +179,7 @@ class UpdateBook extends React.Component {
                                             </Block>
 
                                             <Block middle>
-                                                <Button  onPress={this.upload} color="primary" style={styles.createButton}>
+                                                <Button onPress={this.upload} color="primary" style={styles.createButton}>
                                                     <Text bold size={14} color={argonTheme.COLORS.WHITE}>
                                                         UPDATE
                         </Text>

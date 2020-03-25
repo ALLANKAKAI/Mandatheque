@@ -8,12 +8,13 @@ import {
   KeyboardAvoidingView,
   Picker,
   AsyncStorage,
-  Alert
+  Alert,
+  Image
 } from "react-native";
 import { withNavigation } from 'react-navigation';
 import { Block,Text } from "galio-framework";
-import "abort-controller/polyfill"
-import { Button,  Input } from "../components";
+import "abort-controller/polyfill";
+import { Button,Icon,Input } from "../components";
 import { Images, argonTheme } from "../constants";
 import { BOOKS_ENDPOINT } from "../constants/apis";
 import {CATEGORIES} from "../constants/categories";
@@ -30,7 +31,8 @@ class SingleUpload extends React.Component {
       'name':'',
       'author':'',
       'category':'',
-      'pdf_file':{}
+      'pdf_file':{},
+      'thumbnail':{}
     }
   }
 
@@ -68,6 +70,13 @@ class SingleUpload extends React.Component {
     }
 }
 
+_pickImage = async () => {
+  let result = await DocumentPicker.getDocumentAsync({type:'image/*'});
+  if(result.type == 'success'){
+  this.setState({thumbnail:result})
+  }
+}
+
  upload = async() => {
   var token = await AsyncStorage.getItem('token');
   const data = new FormData();
@@ -79,6 +88,10 @@ class SingleUpload extends React.Component {
     uri:this.state.pdf_file.uri,
     type:'application/pdf',
     name:this.state.pdf_file.name})
+  data.append('thumbnail',{
+      uri:this.state.thumbnail.uri,
+      type:'image/*',
+      name:this.state.thumbnail.name})
 
     this.uploadAlert();
     fetch(BOOKS_ENDPOINT,
@@ -96,6 +109,7 @@ class SingleUpload extends React.Component {
         errorAlert("Fill all fields");
         return false;
       }
+      this.props.navigation.state.params.addBook(result);
       successAlert('Book uploaded successfully');
       
     })
@@ -130,6 +144,17 @@ class SingleUpload extends React.Component {
                       behavior="padding"
                       enabled
                     >
+                      <Block middle style={styles.avatarContainer}>
+                        <Image
+                          source={{ uri: this.state.thumbnail.uri }}
+                          style={styles.avatar}
+                        />
+                          <Button onPress={this._pickImage} color="info" style={styles.createButton}>
+                          <Text bold size={14} color={argonTheme.COLORS.WHITE}>
+                            Choose cover art
+                        </Text>
+                        </Button>
+                      </Block>
                       <Block width={width * 0.8} style={{ marginTop: 10 }}>
                         <Input
                         value={this.state.name}
@@ -203,9 +228,15 @@ const styles = StyleSheet.create({
     overflow: "hidden"
 
   },
+  avatar: {
+    width: 150,
+    height: 150,
+    borderRadius: 2,
+    borderWidth: 0
+  },
   registerContainer: {
     width: width * 0.9,
-    height: height * 0.6,
+    height: height * 0.9,
     backgroundColor: "#F4F5F7",
     borderRadius: 4,
     shadowColor: argonTheme.COLORS.BLACK,

@@ -18,10 +18,10 @@ class Card extends React.Component {
       const {navigation,edit} = this.props;
 
       if(edit){
-        navigation.navigate('EditBook',{'item':this.props.item});
+        navigation.navigate('EditBook',{'item':this.props.item,removeBook:this.props.removeBook,updateBook:this.props.updateBook});
       }
       else{
-        navigation.navigate('SingleBook',{'item':this.props.item})
+        navigation.navigate('SingleBook',{'item':this.props.item,removeBook:this.props.removeBook})
       }
   }
 
@@ -42,7 +42,7 @@ class Card extends React.Component {
       <Block row={horizontal} card flex style={cardContainer}>
         <TouchableWithoutFeedback onPress={this.navigate}>
           <Block flex style={imgContainer}>
-            <Image source={{uri: ENDPOINT + item.thumbnail}} style={imageStyles} />
+            <Image source={{uri: ENDPOINT + item.thumbnail,cache:'only-if-cached'}} style={imageStyles}  />
           </Block>
         </TouchableWithoutFeedback>
         <TouchableWithoutFeedback onPress={this.navigate}>
